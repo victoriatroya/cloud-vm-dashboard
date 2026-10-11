@@ -7,17 +7,22 @@ import {
   Search,
   SearchX,
   ServerOff,
+  Trash2,
 } from "lucide-react";
 import { Can } from "@/features/auth/components/Can";
+import { useIsAdmin } from "@/features/auth/hooks/use-session";
 import { Button } from "@/shared/ui/Button";
 import { buttonClass } from "@/shared/ui/button-styles";
+import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import { PageHeader } from "@/shared/ui/PageHeader";
 import { SegmentedControl } from "@/shared/ui/SegmentedControl";
 import { VmCard } from "../components/VmCard";
 import { VmGridSkeleton } from "../components/VmGridSkeleton";
+import { useDeleteVm, usePendingVmIds } from "../hooks/use-vm-mutations";
 import { useVms } from "../hooks/use-vms";
-import type { VmStatus } from "../types";
-import { PageHeader } from "@/shared/ui/PageHeader";
+import type { Vm, VmStatus } from "../types";
+import { isTempVm } from "@/shared/lib/vms-cache";
 
 type StatusFilter = "ALL" | VmStatus;
 
@@ -29,8 +34,13 @@ const STATUS_OPTIONS = [
 
 export function VmsPage() {
   const { data: vms, isPending, isError, refetch } = useVms();
+  const isAdmin = useIsAdmin();
+  const pendingIds = usePendingVmIds();
+  const deleteVm = useDeleteVm();
+
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("ALL");
+  const [vmToDelete, setVmToDelete] = useState<Vm | null>(null);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -44,6 +54,32 @@ export function VmsPage() {
     setSearch("");
     setStatus("ALL");
   };
+
+  const confirmDelete = () => {
+    if (vmToDelete) deleteVm.mutate(vmToDelete);
+    setVmToDelete(null);
+  };
+
+  const renderActions = (vm: Vm) =>
+    isAdmin ? (
+      <>
+        <Link
+          to={`/vms/${vm.id}/edit`}
+          className={buttonClass("ghost", "px-3 py-1.5")}
+        >
+          <Pencil className="size-4" />
+          Editar
+        </Link>
+        <Button
+          variant="ghost"
+          className="px-3 py-1.5 hover:bg-danger/10 hover:text-danger"
+          onClick={() => setVmToDelete(vm)}
+        >
+          <Trash2 className="size-4" />
+          Eliminar
+        </Button>
+      </>
+    ) : undefined;
 
   const renderContent = () => {
     if (isPending) return <VmGridSkeleton />;
@@ -98,17 +134,8 @@ export function VmsPage() {
           <VmCard
             key={vm.id}
             vm={vm}
-            actions={
-              <Can role="ADMIN">
-                <Link
-                  to={`/vms/${vm.id}/edit`}
-                  className={buttonClass("ghost", "px-3 py-1.5")}
-                >
-                  <Pencil className="size-4" />
-                  Editar
-                </Link>
-              </Can>
-            }
+            pending={isTempVm(vm) || pendingIds.has(vm.id)}
+            actions={renderActions(vm)}
           />
         ))}
       </div>
@@ -153,6 +180,21 @@ export function VmsPage() {
       </div>
 
       {renderContent()}
+
+      <ConfirmDialog
+        open={vmToDelete !== null}
+        title="¿Eliminar esta VM?"
+        description={
+          <>
+            Se eliminará{" "}
+            <strong className="text-text">{vmToDelete?.name}</strong>. Esta
+            acción no se puede deshacer.
+          </>
+        }
+        confirmLabel="Eliminar"
+        onConfirm={confirmDelete}
+        onCancel={() => setVmToDelete(null)}
+      />
     </div>
   );
 }

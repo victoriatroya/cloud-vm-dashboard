@@ -2,10 +2,12 @@ import type { ReactNode } from "react";
 import {
   Cpu,
   HardDrive,
+  Loader2,
   MemoryStick,
   Server,
   type LucideIcon,
 } from "lucide-react";
+import { cn } from "@/shared/lib/cn";
 import { formatGb } from "../lib/resources";
 import { OS_LABEL, type Vm } from "../types";
 import { StatusBadge } from "./StatusBadge";
@@ -13,6 +15,7 @@ import { StatusBadge } from "./StatusBadge";
 interface VmCardProps {
   vm: Vm;
   actions?: ReactNode;
+  pending?: boolean;
 }
 
 function Spec({
@@ -35,9 +38,15 @@ function Spec({
   );
 }
 
-export function VmCard({ vm, actions }: VmCardProps) {
+export function VmCard({ vm, actions, pending = false }: VmCardProps) {
   return (
-    <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article
+      aria-busy={pending}
+      className={cn(
+        "rounded-2xl border border-border bg-surface p-5 shadow-sm transition",
+        pending ? "opacity-70" : "hover:-translate-y-0.5 hover:shadow-md",
+      )}
+    >
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -57,10 +66,17 @@ export function VmCard({ vm, actions }: VmCardProps) {
         <Spec icon={HardDrive} label="Disco" value={formatGb(vm.diskGb)} />
       </dl>
 
-      {actions && (
-        <footer className="mt-4 flex justify-end gap-2 border-t border-border pt-4">
-          {actions}
+      {pending ? (
+        <footer className="mt-4 flex items-center justify-end gap-2 border-t border-border pt-4 text-xs text-text-muted">
+          <Loader2 className="size-3.5 animate-spin" />
+          Guardando…
         </footer>
+      ) : (
+        actions && (
+          <footer className="mt-4 flex justify-end gap-2 border-t border-border pt-4">
+            {actions}
+          </footer>
+        )
       )}
     </article>
   );
