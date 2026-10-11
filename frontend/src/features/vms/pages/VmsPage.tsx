@@ -4,6 +4,8 @@ import {
   AlertTriangle,
   Pencil,
   Plus,
+  Power,
+  PowerOff,
   Search,
   SearchX,
   ServerOff,
@@ -11,6 +13,7 @@ import {
 } from "lucide-react";
 import { Can } from "@/features/auth/components/Can";
 import { useIsAdmin } from "@/features/auth/hooks/use-session";
+import { useRealtimeStore } from "@/features/realtime/realtime.store";
 import { Button } from "@/shared/ui/Button";
 import { buttonClass } from "@/shared/ui/button-styles";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
@@ -19,7 +22,11 @@ import { PageHeader } from "@/shared/ui/PageHeader";
 import { SegmentedControl } from "@/shared/ui/SegmentedControl";
 import { VmCard } from "../components/VmCard";
 import { VmGridSkeleton } from "../components/VmGridSkeleton";
-import { useDeleteVm, usePendingVmIds } from "../hooks/use-vm-mutations";
+import {
+  useDeleteVm,
+  usePendingVmIds,
+  useUpdateVm,
+} from "../hooks/use-vm-mutations";
 import { useVms } from "../hooks/use-vms";
 import type { Vm, VmStatus } from "../types";
 import { isTempVm } from "@/shared/lib/vms-cache";
@@ -36,6 +43,8 @@ export function VmsPage() {
   const { data: vms, isPending, isError, refetch } = useVms();
   const isAdmin = useIsAdmin();
   const pendingIds = usePendingVmIds();
+  const highlights = useRealtimeStore((s) => s.highlights);
+  const updateVm = useUpdateVm();
   const deleteVm = useDeleteVm();
 
   const [search, setSearch] = useState("");
@@ -55,31 +64,63 @@ export function VmsPage() {
     setStatus("ALL");
   };
 
+  const togglePower = (vm: Vm) => {
+    updateVm.mutate({
+      id: vm.id,
+      input: { status: vm.status === "RUNNING" ? "STOPPED" : "RUNNING" },
+    });
+  };
+
   const confirmDelete = () => {
     if (vmToDelete) deleteVm.mutate(vmToDelete);
     setVmToDelete(null);
   };
 
-  const renderActions = (vm: Vm) =>
-    isAdmin ? (
+  const renderActions = (vm: Vm) => {
+    if (!isAdmin) return undefined;
+
+    const isRunning = vm.status === "RUNNING";
+
+    return (
       <>
-        <Link
-          to={`/vms/${vm.id}/edit`}
-          className={buttonClass("ghost", "px-3 py-1.5")}
-        >
-          <Pencil className="size-4" />
-          Editar
-        </Link>
         <Button
           variant="ghost"
-          className="px-3 py-1.5 hover:bg-danger/10 hover:text-danger"
-          onClick={() => setVmToDelete(vm)}
+          className={
+            isRunning
+              ? "px-3 py-1.5 hover:bg-warning/10 hover:text-warning"
+              : "px-3 py-1.5 hover:bg-success/10 hover:text-success"
+          }
+          onClick={() => togglePower(vm)}
         >
-          <Trash2 className="size-4" />
-          Eliminar
+          {isRunning ? (
+            <PowerOff className="size-4" />
+          ) : (
+            <Power className="size-4" />
+          )}
+          {isRunning ? "Apagar" : "Encender"}
         </Button>
+        <div className="flex gap-1">
+          <Link
+            to={`/vms/${vm.id}/edit`}
+            className={buttonClass("ghost", "px-2.5 py-1.5")}
+            aria-label={`Editar ${vm.name}`}
+            title="Editar"
+          >
+            <Pencil className="size-4" />
+          </Link>
+          <Button
+            variant="ghost"
+            className="px-2.5 py-1.5 hover:bg-danger/10 hover:text-danger"
+            onClick={() => setVmToDelete(vm)}
+            aria-label={`Eliminar ${vm.name}`}
+            title="Eliminar"
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
       </>
-    ) : undefined;
+    );
+  };
 
   const renderContent = () => {
     if (isPending) return <VmGridSkeleton />;
@@ -135,6 +176,7 @@ export function VmsPage() {
             key={vm.id}
             vm={vm}
             pending={isTempVm(vm) || pendingIds.has(vm.id)}
+            highlightKey={highlights[vm.id]}
             actions={renderActions(vm)}
           />
         ))}

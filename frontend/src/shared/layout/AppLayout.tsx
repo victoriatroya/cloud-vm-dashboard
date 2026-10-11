@@ -6,6 +6,8 @@ import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 import { useCurrentUser } from "@/features/auth/hooks/use-session";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 import { ROLE_LABEL } from "@/features/auth/types";
+import { ConnectionStatus } from "@/features/realtime/components/ConnectionStatus";
+import { useVmRealtime } from "@/features/realtime/hooks/use-vm-realtime";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -24,6 +26,8 @@ function navClass({ isActive }: { isActive: boolean }) {
 export function AppLayout() {
   const user = useCurrentUser();
   const logout = useLogout();
+
+  useVmRealtime();
 
   return (
     <div className="min-h-screen md:grid md:grid-cols-[240px_1fr]">
@@ -55,6 +59,7 @@ export function AppLayout() {
           </nav>
 
           <div className="ml-auto flex items-center gap-3">
+            <ConnectionStatus />
             <ThemeToggle />
             <div className="hidden text-right sm:block">
               <p className="text-sm font-medium">{user.name}</p>

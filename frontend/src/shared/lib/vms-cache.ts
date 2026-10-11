@@ -17,6 +17,10 @@ export function removeVm(vms: Vm[] | undefined, id: string): Vm[] {
   return (vms ?? []).filter((v) => v.id !== id);
 }
 
+export function removeTempByName(vms: Vm[] | undefined, name: string): Vm[] {
+  return (vms ?? []).filter((v) => !(isTempVm(v) && v.name === name));
+}
+
 export function insertVmAt(vms: Vm[] | undefined, vm: Vm, index: number): Vm[] {
   const list = vms ?? [];
   if (list.some((v) => v.id === vm.id)) return list;

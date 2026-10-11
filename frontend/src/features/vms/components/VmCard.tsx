@@ -16,6 +16,7 @@ interface VmCardProps {
   vm: Vm;
   actions?: ReactNode;
   pending?: boolean;
+  highlightKey?: number;
 }
 
 function Spec({
@@ -38,15 +39,28 @@ function Spec({
   );
 }
 
-export function VmCard({ vm, actions, pending = false }: VmCardProps) {
+export function VmCard({
+  vm,
+  actions,
+  pending = false,
+  highlightKey,
+}: VmCardProps) {
   return (
     <article
       aria-busy={pending}
       className={cn(
-        "rounded-2xl border border-border bg-surface p-5 shadow-sm transition",
+        "relative rounded-2xl border border-border bg-surface p-5 shadow-sm transition",
         pending ? "opacity-70" : "hover:-translate-y-0.5 hover:shadow-md",
       )}
     >
+      {highlightKey && (
+        <span
+          key={highlightKey}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-2xl bg-primary/10 ring-2 ring-primary animate-vm-highlight motion-reduce:animate-none"
+        />
+      )}
+
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -73,7 +87,7 @@ export function VmCard({ vm, actions, pending = false }: VmCardProps) {
         </footer>
       ) : (
         actions && (
-          <footer className="mt-4 flex justify-end gap-2 border-t border-border pt-4">
+          <footer className="relative mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
             {actions}
           </footer>
         )
