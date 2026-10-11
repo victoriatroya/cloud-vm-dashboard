@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useSession } from "../hooks/use-session";
-import type { Role } from "../type";
+import type { Role } from "../types";
 
 export function Can({ role, children }: { role: Role; children: ReactNode }) {
   const { data: user } = useSession();

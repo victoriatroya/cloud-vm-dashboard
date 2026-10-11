@@ -6,7 +6,7 @@ import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { VmsPage } from "@/features/vms/pages/VmsPage";
 import { VmFormPage } from "@/features/vms/pages/VmFormPage";
 import { AppLayout } from "@/shared/layout/AppLayout";
-import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
 
 export const router = createBrowserRouter([
   {

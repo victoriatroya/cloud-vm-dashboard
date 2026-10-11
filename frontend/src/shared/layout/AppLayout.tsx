@@ -5,7 +5,7 @@ import { Button } from "@/shared/ui/Button";
 import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 import { useCurrentUser } from "@/features/auth/hooks/use-session";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { ROLE_LABEL } from "@/features/auth/type";
+import { ROLE_LABEL } from "@/features/auth/types";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiError } from "@/shared/lib/http";
 import { authApi } from "../api/auth.api";
 import { sessionQueryKey } from "../query-keys";
-import type { User } from "../type";
+import type { User } from "../types";
 
 export function useSession() {
   return useQuery({

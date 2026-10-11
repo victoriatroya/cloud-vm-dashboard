@@ -1,5 +1,5 @@
 import { http } from "@/shared/lib/http";
-import type { LoginCredentials, User } from "../type";
+import type { LoginCredentials, User } from "../types";
 
 export const authApi = {
   login: (credentials: LoginCredentials) =>
