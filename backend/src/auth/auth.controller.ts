@@ -35,7 +35,7 @@ export class AuthController {
   ): Promise<AuthUser> {
     const { user, token } = await this.authService.login(dto);
     res.cookie(AUTH_COOKIE, token, authCookieOptions);
-    return user; // el token NO va en el body
+    return user;
   }
 
   @Post('logout')

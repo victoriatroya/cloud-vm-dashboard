@@ -1,7 +1,7 @@
 import type { CookieOptions } from 'express';
 
 export const AUTH_COOKIE = 'access_token';
-export const TOKEN_TTL_SECONDS = 60 * 60; // 1 hora
+export const TOKEN_TTL_SECONDS = 60 * 60;
 
 export const baseCookieOptions: CookieOptions = {
   httpOnly: true,

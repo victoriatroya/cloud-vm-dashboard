@@ -15,4 +15,4 @@ coverage/
 # Sistema y logs
 .DS_Store
 *.log
-cookies.txt
+cookies*.txt
