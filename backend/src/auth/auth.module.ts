@@ -20,5 +20,6 @@ import { TOKEN_TTL_SECONDS } from './auth.constants';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports: [JwtModule],
 })
 export class AuthModule {}
