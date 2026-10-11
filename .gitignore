@@ -1,0 +1,17 @@
+# Dependencias y builds
+node_modules/
+dist/
+build/
+coverage/
+
+# Variables de entorno
+.env
+.env.local
+
+# Base de datos local
+*.db
+*.db-journal
+
+# Sistema y logs
+.DS_Store
+*.log
