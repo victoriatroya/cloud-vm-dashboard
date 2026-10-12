@@ -120,8 +120,6 @@ Creadas por el seed. En la pantalla de login también hay botones que rellenan e
 
 **Para probar el tiempo real:** inicia sesión como admin en una ventana normal y como cliente en una ventana de incógnito (las cookies quedan separadas). Al encender o apagar una VM desde el admin, la tarjeta se actualiza en la ventana del cliente.
 
-## Arquitectura
-
 ## Decisiones arquitectónicas
 
 ### Estructura del frontend: por features
